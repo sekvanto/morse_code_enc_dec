@@ -1,24 +1,25 @@
+; Display init message (2-lines)
 DISPLAY_INIT_MSG:
   MOV	  DPTR,#INIT_MSG
-.LOOP:			
+INITL1:			
 	CLR	  A
 	MOVC  A,@A+DPTR  ; next character
-	JZ    .DISPLAY2    ; second line of the message
+	JZ    INITD2    ; second line of the message
 	CALL  SDATA			
 	INC	  DPTR					
-	JMP	  .LOOP
-.DISPLAY2:
+	JMP	  INITL1
+INITD2:
   MOV   DPTR,#INIT_MSG_2
   MOV   A,#0011000000B    ; move cursor to the head of the second line
   CALL  COMMAND
-.LOOP2:
+INITL2:
   CLR   A
   MOVC  A,@A+DPTR
-  JZ    .ENDDISPLAY
+  JZ    INITEND
   CALL  SDATA
   INC   DPTR
-  JMP   .LOOP2
-.ENDDISPLAY:
+  JMP   INITL2
+INITEND:
   RET
 
 ; Initialize LCD when the device boots up
