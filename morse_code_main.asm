@@ -1,0 +1,13 @@
+ORG	0000H
+JMP	START
+ORG	0050H
+
+START:
+  ACALL LCD_INIT
+  ACALL DISPLAY_INIT_MSG
+ENDMES:
+	SJMP $
+
+#include "lcd_display.inc"
+
+END
