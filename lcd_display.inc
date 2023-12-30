@@ -16,12 +16,7 @@ DISPLAY_MENU:
 
 ; The driver for displaying line 1
 DISPLAY_LINE1:
-	; Clear the screen	
-	MOV	  A,#00000001B		
-	CALL  COMMAND
-  ; Return the cursor to the home position
-  MOV   A,#00000010B
-  CALL  COMMAND
+  ACALL CLEAR_SCREEN
 DL1: 			
 	CLR	  A
 	MOVC  A,@A+DPTR  ; next character
@@ -47,6 +42,15 @@ DL2:
 DL2END:
   ACALL DELAY
   RET
+
+; Clear the screen
+CLEAR_SCREEN:
+  ; Clear the screen	
+	MOV	  A,#00000001B		
+	CALL  COMMAND
+  ; Return the cursor to the home position
+  MOV   A,#00000010B
+  CALL  COMMAND
 
 ; Initialize LCD when the device boots up
 LCD_INIT:

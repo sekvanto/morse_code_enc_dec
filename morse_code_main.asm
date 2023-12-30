@@ -9,6 +9,10 @@ START:
   ; Initialize ports with 0
   CLR   B1
   CLR   B2
+  CLR   DOT_B
+  CLR   DASH_B
+  CLR   STOP_B
+  MOV   INDEX,#0
 MAIN:
   ACALL LCD_INIT
   ACALL DISPLAY_INIT_MSG
@@ -26,6 +30,7 @@ ENDMENU:
   //JB  B2,ENCODE
   JMP ENDMENU
 
+#include "decode.inc"
 #include "lcd_display.inc"
 #include "utilities.inc"
 
