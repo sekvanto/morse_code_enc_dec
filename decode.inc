@@ -12,11 +12,18 @@ DECODE:
 DECODE_LOOP:
   ACALL DECODE_SYMBOL
   JMP   DECODE_LOOP
+//ERASE_CH:
+//  ACALL ERASE
+//  JMP   DECODE_LOOP
 DECODE_END:
   JMP   DECODE_END
 
 ; Decode one symbol and display it
 DECODE_SYMBOL:
+  ; Exit the mode
+  ;JB    B2,DECODE_END
+  ; Erase
+  JB    B1,ERASE_CH
   ; Dot not pressed
   JNB   DOT_B,DNEXT
   ACALL DOT
@@ -30,6 +37,11 @@ DNEXT1:
   ; End character
   JB    STOP_B,STOP
   JMP   DECODE_SYMBOL
+ERASE_CH:
+  ACALL ERASE
+ERASE_DEBOUNCE:
+  JB    B1,ERASE_DEBOUNCE    ; Wait until erase is unpressed
+  RET
 STOP:
   ; Display character
   ACALL DISPLAY_CHARACTER

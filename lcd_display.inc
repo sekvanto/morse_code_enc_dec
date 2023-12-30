@@ -1,3 +1,16 @@
+; Erase one character
+ERASE:
+  ; Shift position to the left by 1
+  MOV   A,#00010000B
+  CALL  COMMAND
+  ; Output space
+  MOV   A,#00100000B
+  CALL  SDATA
+  ; Shift position to the left by 1
+  MOV   A,#00010000B
+  CALL  COMMAND
+  RET
+
 ; Display init message (2-lines)
 DISPLAY_INIT_MSG:
   MOV	  DPTR,#INIT_MSG
