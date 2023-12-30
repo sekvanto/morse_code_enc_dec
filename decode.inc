@@ -10,6 +10,7 @@ DECODE:
   ACALL CLEAR_SCREEN
   ; Binary tree is used for decoding 
 DECODE_LOOP:
+  MOV   INDEX,#0
   ACALL DECODE_SYMBOL
   JMP   DECODE_LOOP
 //ERASE_CH:
@@ -94,6 +95,5 @@ MORSE_TREE: DB ' ', 'E', 'T', 'I', 'A', 'N', 'M', 'S'
             DB 'X', 'C', 'Y', 'Z', 'Q', ' ', ' ', '5' 
             DB '4', ' ', '3', ' ', ' ', ' ', '2', ' ' 
             DB ' ', ' ', ' ', ' ', ' ', ' ', '1', '6' 
-            DB '=', '/', ' ', ' ', ' ', ' ', ' ', ' ' 
-            DB ' ', ' ', '7', ' ', ' ', ' ', '8', ' ' 
-            DB '9', '0'
+            DB ' ', ' ', ' ', ' ', ' ', ' ', ' ', '7' 
+            DB ' ', ' ', ' ', '8', ' ', '9', '0'
