@@ -1,25 +1,51 @@
 ; Display init message (2-lines)
 DISPLAY_INIT_MSG:
   MOV	  DPTR,#INIT_MSG
-INITL1:			
+  ACALL DISPLAY_LINE1
+  MOV   DPTR,#INIT_MSG_2
+  ACALL DISPLAY_LINE2
+  RET
+
+; Display menu
+DISPLAY_MENU:
+  MOV   DPTR,#MENU_LINE1
+  ACALL DISPLAY_LINE1
+  MOV   DPTR,#MENU_LINE2
+  ACALL DISPLAY_LINE2
+  RET
+
+; The driver for displaying line 1
+DISPLAY_LINE1:
+	; Clear the screen	
+	MOV	  A,#00000001B		
+	CALL  COMMAND
+  ; Return the cursor to the home position
+  MOV   A,#00000010B
+  CALL  COMMAND
+DL1: 			
 	CLR	  A
 	MOVC  A,@A+DPTR  ; next character
-	JZ    INITD2    ; second line of the message
+	JZ    DL1END    ; second line of the message
 	CALL  SDATA			
 	INC	  DPTR					
-	JMP	  INITL1
-INITD2:
-  MOV   DPTR,#INIT_MSG_2
-  MOV   A,#0011000000B    ; move cursor to the head of the second line
+	JMP	  DL1
+DL1END:
+  ACALL DELAY
+  RET
+
+; The driver for displaying line 2
+DISPLAY_LINE2:
+  MOV   A,#11000000B    ; move cursor to the head of the second line
   CALL  COMMAND
-INITL2:
+DL2:
   CLR   A
   MOVC  A,@A+DPTR
-  JZ    INITEND
+  JZ    DL2END
   CALL  SDATA
   INC   DPTR
-  JMP   INITL2
-INITEND:
+  JMP   DL2
+DL2END:
+  ACALL DELAY
   RET
 
 ; Initialize LCD when the device boots up
@@ -81,7 +107,12 @@ WAIT:
 INIT_MSG:
 	DB	"Welcome to the",0
 INIT_MSG_2:
-  DB "morse code tool!",0
+  DB "morse code tool!",0         
+
+MENU_LINE1:
+  DB  "B1: Decode",0
+MENU_LINE2:
+  DB  "B2: Encode",0
 
 DELAY:
 	MOV	R6,#02H
