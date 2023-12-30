@@ -1,3 +1,21 @@
+; Move cursor to the end of line 1 and erase the last character
+MOVE_END_LINE1:
+  MOV   A,#10001111B    ; Move cursor to the end of line 1
+  CALL  COMMAND
+  ; Output space
+  MOV   A,#00100000B
+  CALL  SDATA
+  ; Shift position to the left by 1
+  MOV   A,#00010000B
+  CALL  COMMAND
+  RET
+
+; Move cursor to the start of line 2
+MOVE_TO_LINE2:
+  MOV   A,#11000000B    ; Move cursor to the head of the second line
+  CALL  COMMAND
+  RET
+
 ; Erase one character
 ERASE:
   ; Shift position to the left by 1
@@ -64,6 +82,7 @@ CLEAR_SCREEN:
   ; Return the cursor to the home position
   MOV   A,#00000010B
   CALL  COMMAND
+  RET
 
 ; Initialize LCD when the device boots up
 LCD_INIT:

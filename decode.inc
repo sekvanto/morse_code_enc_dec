@@ -3,19 +3,19 @@ DOT_B   EQU P0.2
 DASH_B  EQU P0.3
 STOP_B  EQU P0.4
 
-INDEX   EQU R0
+INDEX             EQU R0
+CURSOR_POSITION   EQU R1
 
 ; Morse code decoding algorithm
 DECODE:
+  JB    B1,DECODE           ; Wait until B1 is unpressed 
   ACALL CLEAR_SCREEN
+  MOV   CURSOR_POSITION,#0
   ; Binary tree is used for decoding 
 DECODE_LOOP:
   MOV   INDEX,#0
   ACALL DECODE_SYMBOL
   JMP   DECODE_LOOP
-//ERASE_CH:
-//  ACALL ERASE
-//  JMP   DECODE_LOOP
 DECODE_END:
   JMP   DECODE_END
 
@@ -39,19 +39,38 @@ DNEXT1:
   JB    STOP_B,STOP
   JMP   DECODE_SYMBOL
 ERASE_CH:
+  ; If index is already 0, dont do anything
+  CJNE  CURSOR_POSITION,#0,ERASE_CH1
+  JMP   ERASE_DEBOUNCE
+ERASE_CH1:
+  ; If the index is 16, jump to the end of the first line
+  CJNE  CURSOR_POSITION,#16,ERASE_CH2
+  ACALL MOVE_END_LINE1
+  DEC   CURSOR_POSITION
+  JMP   ERASE_DEBOUNCE
+ERASE_CH2:
   ACALL ERASE
+  DEC   CURSOR_POSITION
 ERASE_DEBOUNCE:
   JB    B1,ERASE_DEBOUNCE    ; Wait until erase is unpressed
   RET
 STOP:
   ; Display character
   ACALL DISPLAY_CHARACTER
-  MOV   INDEX,#0
+  INC   CURSOR_POSITION      ; Increment cursor position
+  ; If cursor position = 16, jump to the second line
+  CJNE  CURSOR_POSITION,#16,CURSOR_NEXT
+  ACALL MOVE_TO_LINE2
+CURSOR_NEXT:
+  ; If cursor position = 32, erase the screen
+  CJNE  CURSOR_POSITION,#32,STOP_DEBOUNCE
+  ACALL CLEAR_SCREEN
+  MOV   CURSOR_POSITION,#1
+  ACALL DISPLAY_CHARACTER
 STOP_DEBOUNCE:
   JB    STOP_B,STOP_DEBOUNCE ; Wait until stop is unpressed
   RET
 
-; Index <= 65
 DISPLAY_CHARACTER:
   MOV   A,INDEX
   MOV   DPTR,#MORSE_TREE
