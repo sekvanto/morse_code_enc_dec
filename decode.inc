@@ -15,14 +15,17 @@ DECODE:
 DECODE_LOOP:
   MOV   INDEX,#0
   ACALL DECODE_SYMBOL
+  ; Exit the mode
+  JB    B2,DECODE_END
   JMP   DECODE_LOOP
 DECODE_END:
-  JMP   DECODE_END
+  JB    B2,DECODE_END   ; Wait until B2 is unpressed
+  RET
 
 ; Decode one symbol and display it
 DECODE_SYMBOL:
   ; Exit the mode
-  ;JB    B2,DECODE_END
+  JB    B2,DECODE_END_SYM
   ; Erase
   JB    B1,ERASE_CH
   ; Dot not pressed
@@ -53,6 +56,8 @@ ERASE_CH2:
   DEC   CURSOR_POSITION
 ERASE_DEBOUNCE:
   JB    B1,ERASE_DEBOUNCE    ; Wait until erase is unpressed
+  RET
+DECODE_END_SYM:
   RET
 STOP:
   ; Display character

@@ -1,6 +1,10 @@
 ORG	0000H
 JMP	START
 ORG	0050H
+;ORG 0BH
+;JMP TIMER0INT ; 
+;ORG 23H
+;JMP RECEIVE   ; UART for receiving input text
 
 B1  EQU P0.0
 B2  EQU P0.1
@@ -19,19 +23,30 @@ MAIN:
   ACALL DISPLAY_INIT_MSG
 ENDMES:
   JB  B1,MENU   ; Press (B1) lower button to enter the menu
-	JMP ENDMES
+  JMP ENDMES
 
 ; Display menu
 MENU:
   ACALL DISPLAY_MENU
+MENU_DEBOUNCE:
+  JB  B1,MENU_DEBOUNCE   ; Wait until B1 isnt pressed
 ENDMENU:
   ; B1: jump to decode morse code input into text
   ; B2: jump to encode text (buzzer + LED output)
-  JB  B1,DECODE
-  //JB  B2,ENCODE
+  JB  B1,DECODE_CALL
+  JB  B2,ENCODE_CALL
   JMP ENDMENU
+DECODE_CALL:
+  LCALL DECODE
+  ACALL DISPLAY_MENU
+  JMP   ENDMENU
+ENCODE_CALL:
+  LCALL ENCODE
+  ACALL DISPLAY_MENU
+  JMP   ENDMENU
 
 #include "decode.inc"
+#include "encode.inc"
 #include "lcd_display.inc"
 #include "utilities.inc"
 
