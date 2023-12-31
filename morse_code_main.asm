@@ -1,10 +1,10 @@
 ORG	0000H
 JMP	START
 ORG	0050H
-;ORG 0BH
-;JMP TIMER0INT ; 
-;ORG 23H
-;JMP RECEIVE   ; UART for receiving input text
+ORG 0BH
+JMP TIMER0INT      ; 4 ms timer interrupt
+ORG 23H
+JMP UART_RECEIVE   ; UART for receiving input text
 
 B1  EQU P0.0
 B2  EQU P0.1
@@ -16,8 +16,12 @@ START:
   CLR   DOT_B
   CLR   DASH_B
   CLR   STOP_B
+  CLR   SQUARE_WAVE
   MOV   INDEX,#0
   MOV   CURSOR_POSITION,#0
+  ; Initialize timers and interrupts
+  ACALL INIT_UART_BUFFER
+  ACALL BUZZER_TIMER_INIT
 MAIN:
   ACALL LCD_INIT
   ACALL DISPLAY_INIT_MSG
@@ -48,6 +52,7 @@ ENCODE_CALL:
 #include "decode.inc"
 #include "encode.inc"
 #include "lcd_display.inc"
+#include "buffer.inc"
 #include "utilities.inc"
 
 END

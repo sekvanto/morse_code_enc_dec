@@ -3,8 +3,8 @@ DOT_B   EQU P0.2
 DASH_B  EQU P0.3
 STOP_B  EQU P0.4
 
-INDEX             EQU R0
-CURSOR_POSITION   EQU R1
+INDEX             EQU R1
+CURSOR_POSITION   EQU R2
 
 ; Morse code decoding algorithm
 DECODE:
