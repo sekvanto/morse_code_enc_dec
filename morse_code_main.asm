@@ -9,6 +9,8 @@ JMP UART_RECEIVE   ; UART for receiving input text
 B1  EQU P0.0
 B2  EQU P0.1
 
+CURRENTLY_ENCODING  EQU R4    ; Set to 1 when the Encoding mode entered
+
 START:
   ; Initialize ports with 0
   CLR   B1
@@ -19,6 +21,7 @@ START:
   CLR   SQUARE_WAVE
   MOV   INDEX,#0
   MOV   CURSOR_POSITION,#0
+  MOV   CURRENTLY_ENCODING,#0
   ; Initialize timers and interrupts
   ACALL INIT_UART_BUFFER
   ACALL BUZZER_TIMER_INIT
@@ -45,8 +48,10 @@ DECODE_CALL:
   ACALL DISPLAY_MENU
   JMP   ENDMENU
 ENCODE_CALL:
+  MOV   CURRENTLY_ENCODING,#1
   LCALL ENCODE
   ACALL DISPLAY_MENU
+  MOV   CURRENTLY_ENCODING,#0
   JMP   ENDMENU
 
 #include "decode.inc"

@@ -17,6 +17,8 @@ TIMER0INT:
 ; Morse code encoding algorithm using buzzer
 ; 600 Hz, 30 WPM
 ENCODE:
-  JB    B2,ENCODE   ; Wait until B2 is unpressed
+  JB    B2,ENCODE     ; Wait until B2 is unpressed
   ACALL CLEAR_SCREEN
+ENCODE_LOOP:          ; Encode loop, fetch characters from the buffer and turn them into sound
+  ;
   RET

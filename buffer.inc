@@ -2,7 +2,14 @@
 BUFFER_SIZE EQU 30             ; Define the buffer size
 BUFFER:     DS  BUFFER_SIZE    ; Allocate buffer
 
-BUF_HEAD    EQU R3      ; Head index for buffer (i.e. 0-29)
+; Buffer head increases whenever a symbol is added.
+; Buffer tail is increases whenever a symbol is retrieved, to catch up with the tail
+; When the tail exceeds the final index in the allocated array space (e.g. 30)
+; it is set to 0 circularly.
+; When the head catches up with the tail, this means the maximum size is reached
+; And no new elements can be added until some space is freed by the reader
+BUF_HEAD:    DS 1       ; Head index for the buffer (i.e. 0-29)
+BUF_TAIL:    DS 1
 
 INIT_UART_BUFFER:
   MOV   BUF_HEAD, #0    ; Initialize BUF_HEAD (BUFFER head index) as 0
@@ -27,13 +34,18 @@ INIT_UART_BUFFER:
 
 ; UART interrupt routine
 UART_RECEIVE:
+  PUSH  ACC
+  PUSH  B
+  ; If theres nothing to receive, exit
   JNB   RI,RX_END
-  MOV A, BUFFER_SIZE
-  MOV B, A              ; Store buffer size in B
+  ; If the mode currently isnt Encoding, exit
+  CJNE  CURRENTLY_ENCODING,#1,RX_END
+  MOV   A, BUFFER_SIZE
+  MOV   B, A              ; Store buffer size in B
   ; Check if BUF_HEAD has reached or exceeded the end of BUFFER
   MOV   A, BUF_HEAD
   CJNE  A, B, NOT_AT_END
-  RETI                  ; At end, dont do anything
+  JMP   RX_END          ; At end, dont do anything
 NOT_AT_END:
   //MOV A, BUF_HEAD
   MOV   DPTR,#BUFFER
@@ -42,4 +54,6 @@ NOT_AT_END:
   INC   BUF_HEAD        ; Increment head pointer
   CLR   RI
 RX_END:
+  POP   B
+  POP   ACC
   RETI
