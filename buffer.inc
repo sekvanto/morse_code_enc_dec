@@ -8,11 +8,12 @@ BUFFER:     DS  BUFFER_SIZE    ; Allocate buffer
 ; it is set to 0 circularly.
 ; When the head catches up with the tail, this means the maximum size is reached
 ; And no new elements can be added until some space is freed by the reader
-BUF_HEAD:    DS 1       ; Head index for the buffer (i.e. 0-29)
-BUF_TAIL:    DS 1
+BUF_HEAD  EQU  R6       ; Head index for the buffer (i.e. 0-29)
+BUF_TAIL  EQU  R7
 
 INIT_UART_BUFFER:
-  MOV   BUF_HEAD, #0    ; Initialize BUF_HEAD (BUFFER head index) as 0
+  MOV   BUF_HEAD,#0      ; Initialize BUF_HEAD (BUFFER head index) as 0
+  MOV   BUF_TAIL,#0
  
   SETB  ES              ; Serial Port Interrupt
   CLR   TI
@@ -40,18 +41,24 @@ UART_RECEIVE:
   JNB   RI,RX_END
   ; If the mode currently isnt Encoding, exit
   CJNE  CURRENTLY_ENCODING,#1,RX_END
-  MOV   A, BUFFER_SIZE
-  MOV   B, A              ; Store buffer size in B
-  ; Check if BUF_HEAD has reached or exceeded the end of BUFFER
-  MOV   A, BUF_HEAD
-  CJNE  A, B, NOT_AT_END
-  JMP   RX_END          ; At end, dont do anything
+//  MOV   B, BUF_TAIL     ; Store buffer size in B
+//  ; Check if BUF_HEAD has reached or exceeded the end of BUFFER
+//  MOV   A, BUF_HEAD
+//  CJNE  A, B, NOT_AT_END
+//  JMP   RX_END          ; At end, dont do anything
 NOT_AT_END:
-  //MOV A, BUF_HEAD
+  ; Save original DPL
+  PUSH DPL
   MOV   DPTR,#BUFFER
+  MOV   A,BUF_HEAD
+  ; Add buffer head index to DPTR (DPL - lower byte of DPTR)
+  ADD   A,DPL
+  MOV   DPL,A
+
   MOV   A, SBUF         ; Read character from UART buffer
   MOVX  @DPTR, A        ; Store character in the buffer
   INC   BUF_HEAD        ; Increment head pointer
+  POP   DPL
   CLR   RI
 RX_END:
   POP   B

@@ -9,6 +9,7 @@ JMP UART_RECEIVE   ; UART for receiving input text
 B1  EQU P0.0
 B2  EQU P0.1
 
+TIMER_INTERVALS     EQU R3    ; Timer intervals left until the sound turns off (e.g. a 40ms sound => 10 intervals)
 CURRENTLY_ENCODING  EQU R4    ; Set to 1 when the Encoding mode entered
 
 START:
@@ -22,6 +23,7 @@ START:
   MOV   INDEX,#0
   MOV   CURSOR_POSITION,#0
   MOV   CURRENTLY_ENCODING,#0
+  MOV   TIMER_INTERVALS,#0
   ; Initialize timers and interrupts
   ACALL INIT_UART_BUFFER
   ACALL BUZZER_TIMER_INIT
@@ -55,9 +57,9 @@ ENCODE_CALL:
   JMP   ENDMENU
 
 #include "decode.inc"
+#include "buffer.inc"
 #include "encode.inc"
 #include "lcd_display.inc"
-#include "buffer.inc"
 #include "utilities.inc"
 
 END
