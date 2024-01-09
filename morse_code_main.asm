@@ -1,10 +1,10 @@
 ORG	0000H
 JMP	START
+;ORG 0BH
+;JMP TIMER0INT      ; 4 ms timer interrupt
+;ORG 23H
+;JMP UART_RECEIVE   ; UART for receiving input text
 ORG	0050H
-ORG 0BH
-JMP TIMER0INT      ; 4 ms timer interrupt
-ORG 23H
-JMP UART_RECEIVE   ; UART for receiving input text
 
 B1  EQU P0.0
 B2  EQU P0.1
@@ -28,8 +28,8 @@ MAIN:
   ACALL LCD_INIT
   ACALL DISPLAY_INIT_MSG
   ; Initialize timers and interrupts
-  ACALL INIT_UART_BUFFER
-  ACALL BUZZER_TIMER_INIT
+  ;ACALL INIT_UART_BUFFER
+  ;ACALL BUZZER_TIMER_INIT
 ENDMES:
   JB  B1,MENU   ; Press (B1) lower button to enter the menu
   JMP ENDMES
