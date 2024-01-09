@@ -1,9 +1,9 @@
 ORG	0000H
 JMP	START
-;ORG 0BH
-;JMP TIMER0INT      ; 4 ms timer interrupt
-;ORG 23H
-;JMP UART_RECEIVE   ; UART for receiving input text
+ORG 0BH
+JMP TIMER0INT      ; 4 ms timer interrupt
+ORG 23H
+JMP UART_RECEIVE   ; UART for receiving input text
 ORG	0050H
 
 B1  EQU P0.0
@@ -28,8 +28,8 @@ MAIN:
   ACALL LCD_INIT
   ACALL DISPLAY_INIT_MSG
   ; Initialize timers and interrupts
-  ;ACALL INIT_UART_BUFFER
-  ;ACALL BUZZER_TIMER_INIT
+  ACALL INIT_UART_BUFFER
+  ACALL BUZZER_TIMER_INIT
 ENDMES:
   JB  B1,MENU   ; Press (B1) lower button to enter the menu
   JMP ENDMES
@@ -48,15 +48,16 @@ ENDMENU:
 DECODE_CALL:
   LCALL DECODE
   ACALL DISPLAY_MENU
+DECODING_DEBOUNCE:
+  JB    B1,DECODING_DEBOUNCE
   JMP   ENDMENU
 ENCODE_CALL:
   MOV   CURRENTLY_ENCODING,#1
   LCALL ENCODE
-  ;temporarily
-  JMP   ENCODE_CALL
-
   ACALL DISPLAY_MENU
   MOV   CURRENTLY_ENCODING,#0
+ENCODING_DEBOUNCE:
+  JB    B2,ENCODING_DEBOUNCE    ; Wait until B2 is unpressed
   JMP   ENDMENU
 
 #include "decode.inc"
